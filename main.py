@@ -1,24 +1,14 @@
 #!/usr/bin/env python
 
 import logging
+
 import webapp2
 
+from handlers import MainHandler, SignupHandler, VerificationHandler, SetPasswordHandler, LoginHandler, LogoutHandler, \
+    ForgotPasswordHandler, AuthenticatedHandler
 
-def user_required(handler):
-    """
-      Decorator that checks if there's a user associated with the current session.
-      Will also fail if there's no session present.
-    """
-
-    def check_login(self, *args, **kwargs):
-        auth = self.auth
-        if not auth.get_user_by_session():
-            self.redirect(self.uri_for('login'), abort=True)
-        else:
-            return handler(self, *args, **kwargs)
-
-    return check_login
-
+# TODO(russomi): Find a better place to put this
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 config = {
@@ -31,16 +21,16 @@ config = {
     }
 }
 
-app = webapp2.WSGIApplication([
-                                  webapp2.Route('/', MainHandler, name='home'),
-                                  webapp2.Route('/signup', SignupHandler),
-                                  webapp2.Route('/<type:v|p>/<user_id:\d+>-<signup_token:.+>',
-                                                handler=VerificationHandler, name='verification'),
-                                  webapp2.Route('/password', SetPasswordHandler),
-                                  webapp2.Route('/login', LoginHandler, name='login'),
-                                  webapp2.Route('/logout', LogoutHandler, name='logout'),
-                                  webapp2.Route('/forgot', ForgotPasswordHandler, name='forgot'),
-                                  webapp2.Route('/authenticated', AuthenticatedHandler, name='authenticated')
-                              ], debug=True, config=config)
+routes = [
+    webapp2.Route('/', MainHandler, name='home'),
+    webapp2.Route('/signup', SignupHandler),
+    webapp2.Route('/<type:v|p>/<user_id:\d+>-<signup_token:.+>',
+                  handler=VerificationHandler, name='verification'),
+    webapp2.Route('/password', SetPasswordHandler),
+    webapp2.Route('/login', LoginHandler, name='login'),
+    webapp2.Route('/logout', LogoutHandler, name='logout'),
+    webapp2.Route('/forgot', ForgotPasswordHandler, name='forgot'),
+    webapp2.Route('/authenticated', AuthenticatedHandler, name='authenticated')
+]
 
-logging.getLogger().setLevel(logging.DEBUG)
+app = webapp2.WSGIApplication(routes=routes, debug=True, config=config)
