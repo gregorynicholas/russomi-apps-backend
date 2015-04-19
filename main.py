@@ -7,9 +7,9 @@ import webapp2
 from handlers import MainHandler, SignupHandler, VerificationHandler, SetPasswordHandler, LoginHandler, LogoutHandler, \
     ForgotPasswordHandler, AuthenticatedHandler
 
+
 # TODO(russomi): Find a better place to put this
 logging.getLogger().setLevel(logging.DEBUG)
-
 
 config = {
     'webapp2_extras.auth': {

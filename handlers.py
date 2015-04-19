@@ -1,14 +1,11 @@
 import logging
 
-import jinja2 as template
-
-import webapp2
 from webapp2_extras import auth
 from webapp2_extras import sessions
 from webapp2_extras.auth import InvalidAuthIdError
 from webapp2_extras.auth import InvalidPasswordError
-
-import os.path
+from webapp2_extras import jinja2
+import webapp2
 
 
 def user_required(handler):
@@ -71,20 +68,22 @@ class BaseHandler(webapp2.RequestHandler):
         """Shortcut to access the current session."""
         return self.session_store.get_session(backend="datastore")
 
-    def render_template(self, view_filename, params=None):
-        if not params:
-            params = {}
-        user = self.user_info
-        params['user'] = user
-        path = os.path.join(os.path.dirname(__file__), 'templates', view_filename)
-        self.response.out.write(template.render(path, params))
+    @webapp2.cached_property
+    def jinja2(self):
+        # Returns a Jinja2 renderer cached in the app registry.
+        return jinja2.get_jinja2(app=self.app)
+
+    def render_response(self, _template, **context):
+        # Renders a template and writes the result to the response.
+        rv = self.jinja2.render_template(_template, **context)
+        self.response.write(rv)
 
     def display_message(self, message):
         """Utility function to display a template with a simple message."""
         params = {
             'message': message
         }
-        self.render_template('message.html', params)
+        self.render_response('users/message.html', params)
 
     # this is needed for webapp2 sessions to work
     def dispatch(self):
@@ -101,12 +100,12 @@ class BaseHandler(webapp2.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
-        self.render_template('home.html')
+        self.render_response('users/home.html')
 
 
 class SignupHandler(BaseHandler):
     def get(self):
-        self.render_template('signup.html')
+        self.render_response('users/signup.html')
 
     def post(self):
         user_name = self.request.get('username')
@@ -169,7 +168,7 @@ class ForgotPasswordHandler(BaseHandler):
             'username': username,
             'not_found': not_found
         }
-        self.render_template('forgot.html', params)
+        self.render_response('users/forgot.html', **params)
 
 
 class VerificationHandler(BaseHandler):
@@ -210,7 +209,7 @@ class VerificationHandler(BaseHandler):
                 'user': user,
                 'token': signup_token
             }
-            self.render_template('resetpassword.html', params)
+            self.render_response('users/resetpassword.html', params)
         else:
             logging.info('verification type not supported')
             self.abort(404)
@@ -257,7 +256,7 @@ class LoginHandler(BaseHandler):
             'username': username,
             'failed': failed
         }
-        self.render_template('login.html', params)
+        self.render_response('users/login.html', **params)
 
 
 class LogoutHandler(BaseHandler):
@@ -269,4 +268,17 @@ class LogoutHandler(BaseHandler):
 class AuthenticatedHandler(BaseHandler):
     @user_required
     def get(self):
-        self.render_template('authenticated.html')
+        self.render_response('users/authenticated.html')
+
+
+class PageHandler(BaseHandler):
+    """Renders a generic page that describes its own parameters."""
+
+    def post(self):
+        self.handle_request()
+
+    def get(self):
+        self.handle_request()
+
+    def handle_request(self):
+        pass

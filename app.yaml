@@ -40,10 +40,6 @@ builtins:
 # to the Admin Console dashboard page.
   - admin_redirect: on
 
-# Enables datastore admin at /_ah/datastore_admin/
-# See http://code.google.com/appengine/docs/adminconsole/datastoreadmin.html
-  - datastore_admin: on
-
 # Enables Appstats at /_ah/stats/
 # See http://code.google.com/appengine/docs/python/tools/appstats.html
 #
@@ -58,7 +54,7 @@ builtins:
 
 # Enables Remote API at /_ah/remote_api/
 # See http://code.google.com/appengine/docs/python/tools/uploadingdata.html#Setting_Up_remote_api
-- remote_api: on
+  - remote_api: on
 
 
 inbound_services:
