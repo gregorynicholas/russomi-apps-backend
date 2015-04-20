@@ -1,27 +1,14 @@
 import logging
 
+import webapp2
 from webapp2_extras import auth
 from webapp2_extras import sessions
+from webapp2_extras import sessions_ndb
 from webapp2_extras.auth import InvalidAuthIdError
 from webapp2_extras.auth import InvalidPasswordError
 from webapp2_extras import jinja2
-import webapp2
 
-
-def user_required(handler):
-    """
-      Decorator that checks if there's a user associated with the current session.
-      Will also fail if there's no session present.
-    """
-
-    def check_login(self, *args, **kwargs):
-        auth = self.auth
-        if not auth.get_user_by_session():
-            self.redirect(self.uri_for('login'), abort=True)
-        else:
-            return handler(self, *args, **kwargs)
-
-    return check_login
+from decorators import user_required
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -66,7 +53,9 @@ class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
     def session(self):
         """Shortcut to access the current session."""
-        return self.session_store.get_session(backend="datastore")
+        # return self.session_store.get_session(backend='datastore')
+        return self.session_store.get_session(name='db_session',
+                                              factory=sessions_ndb.DatastoreSessionFactory)
 
     @webapp2.cached_property
     def jinja2(self):
@@ -74,6 +63,8 @@ class BaseHandler(webapp2.RequestHandler):
         return jinja2.get_jinja2(app=self.app)
 
     def render_response(self, _template, **context):
+        user = self.user_info
+        context.update(user=user)
         # Renders a template and writes the result to the response.
         rv = self.jinja2.render_template(_template, **context)
         self.response.write(rv)
@@ -83,9 +74,8 @@ class BaseHandler(webapp2.RequestHandler):
         params = {
             'message': message
         }
-        self.render_response('users/message.html', params)
+        self.render_response('users/message.html', **params)
 
-    # this is needed for webapp2 sessions to work
     def dispatch(self):
         # Get a session store for this request.
         self.session_store = sessions.get_store(request=self.request)
@@ -101,6 +91,19 @@ class BaseHandler(webapp2.RequestHandler):
 class MainHandler(BaseHandler):
     def get(self):
         self.render_response('users/home.html')
+        self.session['foo'] = 'bar'
+
+class PageHandler(BaseHandler):
+    """Renders a generic page that describes its own parameters."""
+
+    def post(self):
+        self.handle_request()
+
+    def get(self):
+        self.handle_request()
+
+    def handle_request(self):
+        pass
 
 
 class SignupHandler(BaseHandler):
@@ -209,7 +212,7 @@ class VerificationHandler(BaseHandler):
                 'user': user,
                 'token': signup_token
             }
-            self.render_response('users/resetpassword.html', params)
+            self.render_response('users/resetpassword.html', **params)
         else:
             logging.info('verification type not supported')
             self.abort(404)
@@ -269,16 +272,3 @@ class AuthenticatedHandler(BaseHandler):
     @user_required
     def get(self):
         self.render_response('users/authenticated.html')
-
-
-class PageHandler(BaseHandler):
-    """Renders a generic page that describes its own parameters."""
-
-    def post(self):
-        self.handle_request()
-
-    def get(self):
-        self.handle_request()
-
-    def handle_request(self):
-        pass
