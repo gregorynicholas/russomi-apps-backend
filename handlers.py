@@ -3,7 +3,7 @@ import logging
 import webapp2
 from webapp2_extras import auth
 from webapp2_extras import sessions
-from webapp2_extras import sessions_ndb
+from webapp2_extras.appengine import sessions_ndb
 from webapp2_extras.auth import InvalidAuthIdError
 from webapp2_extras.auth import InvalidPasswordError
 from webapp2_extras import jinja2
@@ -92,6 +92,7 @@ class MainHandler(BaseHandler):
     def get(self):
         self.render_response('users/home.html')
         self.session['foo'] = 'bar'
+
 
 class PageHandler(BaseHandler):
     """Renders a generic page that describes its own parameters."""

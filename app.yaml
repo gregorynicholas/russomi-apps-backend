@@ -26,13 +26,16 @@ default_expiration: "7d"
 # markupsafe improves the performance of template rendering in jinja2 and setuptools is required 
 # for some template loading functionality.
 libraries:
-- name: markupsafe
-  version: latest
-- name: jinja2
-  version: latest
 - name: webapp2
   version: "2.5.2"
-
+- name: jinja2
+  version: latest
+- name: markupsafe
+  version: latest
+- name: endpoints
+  version: 1.0
+- name: pycrypto
+  version: latest
 
 builtins:
 # Redirects calls to /_ah/admin from the development console of the development web server 
@@ -121,6 +124,8 @@ handlers:
 
 
 # Dynamic handlers
+- url: /_ah/spi/.*
+  script: helloworld_api.app
 
 - url: /.*
   script: main.app

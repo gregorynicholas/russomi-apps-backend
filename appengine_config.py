@@ -20,6 +20,7 @@ from google.appengine.ext import vendor
 import os
 import re
 
+
 # insert `lib` as a site directory so our `main` module can load
 # third-party libraries, and override built-ins with newer
 # versions.
@@ -227,7 +228,7 @@ def appstats_normalize_path(path):
 
 # - http_method()
 # - http_path()
-#   - http_query()
+# - http_query()
 #   - http_status()
 
 # Note that the StatsProto argument is loaded only with summary
@@ -240,11 +241,11 @@ def appstats_extract_key(request):
     return key
 
 
-# ########################################
-# Remote_API Authentication configuration.
+    # ########################################
+    # Remote_API Authentication configuration.
 
-# See google/appengine/ext/remote_api/handler.py for more information.
-# In most cases, you will not want to configure this.
+    # See google/appengine/ext/remote_api/handler.py for more information.
+    # In most cases, you will not want to configure this.
 
-# remoteapi_CUSTOM_ENVIRONMENT_AUTHENTICATION = (
-#     'HTTP_X_APPENGINE_INBOUND_APPID', ['a trusted appid here'])
+    # remoteapi_CUSTOM_ENVIRONMENT_AUTHENTICATION = (
+    #     'HTTP_X_APPENGINE_INBOUND_APPID', ['a trusted appid here'])
