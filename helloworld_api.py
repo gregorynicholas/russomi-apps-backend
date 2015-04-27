@@ -8,7 +8,7 @@ from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
 
-WEB_CLIENT_ID = 'replace this with your web client application ID'
+WEB_CLIENT_ID = '998327152018-ut8ct7qrd5hpjkj96a78gq04pbhk8qpt.apps.googleusercontent.com'
 ANDROID_CLIENT_ID = 'replace this with your Android client ID'
 IOS_CLIENT_ID = 'replace this with your iOS client ID'
 ANDROID_AUDIENCE = WEB_CLIENT_ID
@@ -34,7 +34,7 @@ STORED_GREETINGS = GreetingCollection(items=[
 
 @endpoints.api(name='helloworld', version='v1',
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
-                                   IOS_CLIENT_ID],
+                                   IOS_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID],
                audiences=[ANDROID_AUDIENCE])
 class HelloWorldApi(remote.Service):
     """Helloworld API v1."""
