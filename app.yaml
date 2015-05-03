@@ -122,6 +122,17 @@ handlers:
   static_files: static/\1
   upload: static/(robots\.txt|humans\.txt|crossdomain\.xml|.+\.html)
 
+- url: /js
+  static_dir: static/js
+
+- url: /bootstrap
+  static_dir: static/bootstrap
+
+- url: /home
+  static_files: templates/index.html
+  upload: templates/index\.html
+
+
 
 # Dynamic handlers
 - url: /_ah/spi/.*
