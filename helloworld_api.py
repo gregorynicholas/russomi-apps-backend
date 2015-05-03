@@ -10,8 +10,8 @@ from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
 from webapp2_extras.auth import InvalidAuthIdError, InvalidPasswordError
-from models import User as UserModel
 
+from models import User as UserModel
 import os
 
 
@@ -39,9 +39,11 @@ STORED_GREETINGS = GreetingCollection(items=[
 ])
 
 
-@endpoints.api(name='helloworld', version='v1',
+@endpoints.api(name='helloworld',
+               version='v1',
                allowed_client_ids=[WEB_CLIENT_ID, ANDROID_CLIENT_ID,
                                    IOS_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID],
+               scopes=[endpoints.EMAIL_SCOPE],
                audiences=[ANDROID_AUDIENCE])
 class HelloWorldApi(remote.Service):
     """Helloworld API v1."""
@@ -153,7 +155,8 @@ class User(remote.Service):
 
         # lookup user
         try:
-            user, timestamp = UserModel.get_by_auth_password(user_id, password)
+            user = UserModel.get_by_auth_password(user_id, password)
+
         except (InvalidAuthIdError, InvalidPasswordError) as e:
             logging.info('Login failed for user %s because of %s', user_id, type(e))
             raise endpoints.api_exceptions.UnauthorizedException(message='Username or password not valid.')
